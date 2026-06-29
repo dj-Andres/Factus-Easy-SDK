@@ -1,0 +1,14 @@
+vendor/
+node_modules/
+.env
+.DS_Store
+Thumbs.db
+*.log
+.phpunit.result.cache
+/composer.lock
+tests/*.p12
+tests/*.png
+tests/*.jpg
+examples/*.p12
+examples/*.png
+examples/*.jpg
