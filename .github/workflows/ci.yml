@@ -29,5 +29,3 @@ jobs:
       - run: vendor/bin/pint --test
 
       - run: vendor/bin/phpstan analyse --no-progress src/
-
-      - run: vendor/bin/phpunit

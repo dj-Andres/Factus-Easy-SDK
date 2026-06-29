@@ -6,6 +6,7 @@ node_modules/
 Thumbs.db
 *.log
 .phpunit.result.cache
+.phpunit.cache
 /composer.lock
 tests/*.p12
 tests/*.png
