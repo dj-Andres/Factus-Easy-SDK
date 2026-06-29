@@ -5,6 +5,7 @@ namespace FactusEasy\Sdk;
 use FactusEasy\Sdk\Resources\Auth;
 use FactusEasy\Sdk\Resources\Company;
 use FactusEasy\Sdk\Resources\Document;
+use FactusEasy\Sdk\Support\Idempotency;
 
 class FactusEasy
 {
@@ -49,6 +50,16 @@ class FactusEasy
         }
 
         return $this->document;
+    }
+
+    public function idempotency(): string
+    {
+        return Idempotency::new();
+    }
+
+    public function setRequestId(string $requestId): void
+    {
+        $this->http->setRequestId($requestId);
     }
 
     public function setToken(string $token): void

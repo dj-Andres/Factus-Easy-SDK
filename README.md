@@ -53,6 +53,7 @@ $factus->auth()->login('email@ejemplo.com', 'password');
 $companies = $factus->company()->list();
 
 // Emitir factura
+$idempotencyKey = $factus->idempotency();
 $response = $factus->document()->register($payload, $idempotencyKey);
 
 // Consultar estado de un documento
@@ -73,10 +74,18 @@ src/
 │   ├── Auth.php            → autenticación
 │   ├── Company.php         → empresas
 │   └── Document.php        → documentos electrónicos
-└── Exceptions/             ← Excepciones
-    ├── FactusEasyException.php
-    ├── AuthenticationException.php
-    └── ValidationException.php
+├── Exceptions/             ← Excepciones
+│   ├── FactusEasyException.php      (base)
+│   ├── AuthenticationException.php  (401)
+│   ├── ValidationException.php      (422)
+│   ├── NotFoundException.php        (404)
+│   ├── ConflictException.php        (409)
+│   └── RateLimitException.php       (429)
+└── Support/                ← Utilidades
+    ├── Idempotency.php     → generación de UUID v4
+    ├── TaxCodes.php        → códigos de impuestos SRI
+    ├── PercentageCodes.php → códigos de porcentajes SRI
+    └── PaymentMethods.php  → formas de pago SRI
 ```
 
 ## Auth
@@ -172,7 +181,9 @@ $response = $factus->company()->uploadLogo(
 ### Registrar factura (tipo 01)
 
 ```php
-$idempotencyKey = bin2hex(random_bytes(16));
+use FactusEasy\Sdk\Support\TaxCodes;
+use FactusEasy\Sdk\Support\PercentageCodes;
+use FactusEasy\Sdk\Support\PaymentMethods;
 
 $payload = [
     'ruc' => '1234567890001',
@@ -203,8 +214,8 @@ $payload = [
             'precioTotalSinImpuesto' => 10.00,
             'impuestos' => [
                 [
-                    'codigo' => '2',
-                    'codigoPorcentaje' => '4',
+                    'codigo' => TaxCodes::IVA,
+                    'codigoPorcentaje' => PercentageCodes::IVA_15,
                     'tarifa' => 15.00,
                     'baseImponible' => 10.00,
                     'valor' => 1.50,
@@ -213,7 +224,7 @@ $payload = [
         ],
     ],
     'pagos' => [
-        ['formaPago' => '01', 'total' => 11.50],
+        ['formaPago' => PaymentMethods::EFECTIVO, 'total' => 11.50],
     ],
     'notificaciones' => [
         'email' => null,
@@ -221,7 +232,7 @@ $payload = [
     ],
 ];
 
-$response = $factus->document()->register($payload, $idempotencyKey);
+$response = $factus->document()->register($payload, $factus->idempotency());
 ```
 
 ### Registrar nota de crédito (tipo 04)
@@ -244,32 +255,25 @@ $payload = [
             'claveAutorizacion' => '49 dígitos de la factura original',
         ],
     ],
-    'detalles' => [
-        [
-            'codigoPrincipal' => 'P001',
-            'descripcion' => 'Producto A - Nota de crédito',
-            'cantidad' => 1,
-            'precioUnitario' => 10.00,
-            'descuento' => 0,
-            'precioTotalSinImpuesto' => 10.00,
-            'impuestos' => [
-                [
-                    'codigo' => '2',
-                    'codigoPorcentaje' => '4',
-                    'tarifa' => 15.00,
-                    'baseImponible' => 10.00,
-                    'valor' => 1.50,
-                ],
-            ],
-        ],
-    ],
-    'notificaciones' => [
-        'email' => null,
-        'webhook_url' => null,
-    ],
+    'detalles' => [[
+        'codigoPrincipal' => 'P001',
+        'descripcion' => 'Producto A - Nota de crédito',
+        'cantidad' => 1,
+        'precioUnitario' => 10.00,
+        'descuento' => 0,
+        'precioTotalSinImpuesto' => 10.00,
+        'impuestos' => [[
+            'codigo' => TaxCodes::IVA,
+            'codigoPorcentaje' => PercentageCodes::IVA_15,
+            'tarifa' => 15.00,
+            'baseImponible' => 10.00,
+            'valor' => 1.50,
+        ]],
+    ]],
+    'notificaciones' => ['email' => null, 'webhook_url' => null],
 ];
 
-$response = $factus->document()->register($payload, $idempotencyKey);
+$response = $factus->document()->register($payload, $factus->idempotency());
 ```
 
 ### Registrar retención (tipo 07)
@@ -292,25 +296,20 @@ $payload = [
         ],
         'total' => 100.00,
     ],
-    'detalles' => [
-        [
-            'codigo' => 1,
-            'codigoRetencion' => 303,
-            'baseImponible' => 100.00,
-            'porcentajeRetener' => 1.00,
-            'valorRetenido' => 1.00,
-            'codDocSustento' => '01',
-            'numDocSustento' => '001-001-000000001',
-            'fechaEmisionSustento' => date('d/m/Y'),
-        ],
-    ],
-    'notificaciones' => [
-        'email' => null,
-        'webhook_url' => null,
-    ],
+    'detalles' => [[
+        'codigo' => 1,
+        'codigoRetencion' => 303,
+        'baseImponible' => 100.00,
+        'porcentajeRetener' => 1.00,
+        'valorRetenido' => 1.00,
+        'codDocSustento' => '01',
+        'numDocSustento' => '001-001-000000001',
+        'fechaEmisionSustento' => date('d/m/Y'),
+    ]],
+    'notificaciones' => ['email' => null, 'webhook_url' => null],
 ];
 
-$response = $factus->document()->register($payload, $idempotencyKey);
+$response = $factus->document()->register($payload, $factus->idempotency());
 ```
 
 ### Registrar lote de documentos
@@ -319,19 +318,16 @@ $response = $factus->document()->register($payload, $idempotencyKey);
 $payload = [
     'ruc' => '1234567890001',
     'tipo' => '01',
-    'documentos' => [
-        [
-            'id_externo' => 'batch-001',
-            'factura' => [...],
-            'detalles' => [...],
-            'pagos' => [...],
-            'notificaciones' => [...],
-        ],
-        // ... hasta 50 documentos
-    ],
+    'documentos' => [[
+        'id_externo' => 'batch-001',
+        'factura' => [...],
+        'detalles' => [...],
+        'pagos' => [...],
+        'notificaciones' => [...],
+    ]],
 ];
 
-$response = $factus->document()->registerBatch($payload, $idempotencyKey);
+$response = $factus->document()->registerBatch($payload, $factus->idempotency());
 ```
 
 ### Consultar estado de documentos
@@ -352,21 +348,17 @@ $response = $factus->document()->status([
     'page' => 1,
     'per_page' => 20,
 ]);
-
-// Parámetros disponibles:
-// ruc, tipo (01/04/07), external_id, access_key, status,
-// date_from, date_to, page, per_page, include_xml
 ```
 
 ### Descargar RIDE PDF
 
 ```php
-$pdfContent = $factus->document()->downloadRide(
-    accessKey: '49 dígitos de la clave de acceso',
-    ruc: '1234567890001',
-);
-
+// En memoria
+$pdfContent = $factus->document()->downloadRide($accessKey, $ruc);
 file_put_contents('factura.pdf', $pdfContent);
+
+// Directo a disco (streaming, sin cargar en RAM)
+$factus->document()->downloadRideTo($accessKey, $ruc, '/ruta/factura.pdf');
 ```
 
 ## Manejo de errores
@@ -374,6 +366,9 @@ file_put_contents('factura.pdf', $pdfContent);
 ```php
 use FactusEasy\Sdk\Exceptions\ValidationException;
 use FactusEasy\Sdk\Exceptions\AuthenticationException;
+use FactusEasy\Sdk\Exceptions\NotFoundException;
+use FactusEasy\Sdk\Exceptions\ConflictException;
+use FactusEasy\Sdk\Exceptions\RateLimitException;
 use FactusEasy\Sdk\Exceptions\FactusEasyException;
 
 try {
@@ -382,7 +377,13 @@ try {
     echo $e->getMessage();
     print_r($e->getErrors());   // errores por campo
 } catch (AuthenticationException $e) {
-    echo 'Token inválido o expirado: ' . $e->getMessage();
+    echo 'Token inválido: ' . $e->getMessage();
+} catch (NotFoundException $e) {
+    echo 'Recurso no encontrado: ' . $e->getMessage();
+} catch (ConflictException $e) {
+    echo 'Conflicto de idempotencia: ' . $e->getMessage();
+} catch (RateLimitException $e) {
+    echo 'Demasiadas solicitudes. Reintentar en ' . ($e->getRetryAfter() ?? '?') . 's';
 } catch (FactusEasyException $e) {
     echo 'Error: ' . $e->getMessage();
     print_r($e->getContext());
@@ -391,9 +392,74 @@ try {
 
 | Excepción | Código HTTP | Cuándo ocurre |
 |-----------|-------------|---------------|
-| `ValidationException` | 422 | Datos inválidos (errores por campo en `getErrors()`) |
 | `AuthenticationException` | 401 | Token inválido o expirado |
-| `FactusEasyException` | 4xx/5xx | Otros errores (contexto en `getContext()`) |
+| `NotFoundException` | 404 | Recurso no encontrado |
+| `ConflictException` | 409 | Idempotencia duplicada o conflicto |
+| `ValidationException` | 422 | Datos inválidos (`getErrors()` por campo) |
+| `RateLimitException` | 429 | Demasiadas solicitudes (`getRetryAfter()`) |
+| `FactusEasyException` | 4xx/5xx | Otros errores (`getContext()` con detalles) |
+
+## Errores frecuentes
+
+### 401 — Token inválido o expirado
+- El token tiene validez de 24h. Vuelve a llamar a `auth()->login()` o renueva con `setToken()`.
+- Verifica que email y password en `.env` sean correctos.
+
+### 422 — Error de validación
+- Revisa `$e->getErrors()` que devuelve un array con los errores por campo.
+- Causas comunes: fecha debe ser hoy (`d/m/Y`), impuesto/porcentaje no existe en catálogo, secuencial duplicado, RUC sin certificado.
+
+### 409 — Conflicto de idempotencia
+- El `Idempotency-Key` ya fue usado con otro payload o la misma solicitud ya está en proceso.
+- Genera una nueva key con `$factus->idempotency()` o espera a que finalice el proceso anterior.
+
+### 429 — Rate limit
+- Has superado el límite de solicitudes por minuto. Revisa `$e->getRetryAfter()` para saber cuándo reintentar.
+
+### 404 — Recurso no encontrado
+- Verifica que el RUC exista, la empresa esté activa y el access key sea correcto de 49 dígitos.
+
+## Utilidades
+
+### Idempotency
+
+Genera claves de idempotencia para proteger contra duplicados:
+
+```php
+$key = $factus->idempotency();        // vía helper
+$key = Idempotency::new();            // vía clase estática
+// Ejemplo: "5973bb92-826c-40e9-8fab-adb0de003364"
+```
+
+### Request ID (trazabilidad)
+
+```php
+$factus->setRequestId('mi-correlativo-001');
+// Envía header X-Request-Id a la API para correlacionar logs
+```
+
+### Constantes SRI
+
+Evita magic strings en los payloads:
+
+```php
+use FactusEasy\Sdk\Support\TaxCodes;
+use FactusEasy\Sdk\Support\PercentageCodes;
+use FactusEasy\Sdk\Support\PaymentMethods;
+
+TaxCodes::IVA                  // '2'
+TaxCodes::ICE                  // '3'
+TaxCodes::IRBPNR               // '5'
+
+PercentageCodes::IVA_0         // '0'
+PercentageCodes::IVA_12        // '2'
+PercentageCodes::IVA_14        // '3'
+PercentageCodes::IVA_15        // '4'
+
+PaymentMethods::EFECTIVO       // '01'
+PaymentMethods::TRANSFERENCIA  // '24'
+PaymentMethods::TARJETA_CREDITO // '19'
+```
 
 ## Endpoints disponibles
 
@@ -411,6 +477,27 @@ try {
 | `document()->registerBatch()` | `POST /api/document/batch/register` | Sí |
 | `document()->status()` | `GET /api/document/status` | Sí |
 | `document()->downloadRide()` | `GET /api/document/{accessKey}/ride` | Sí |
+| `document()->downloadRideTo()` | `GET /api/document/{accessKey}/ride` | Sí |
+
+## Variables de entorno
+
+| Variable | Obligatorio | Default | Descripción |
+|----------|-------------|---------|-------------|
+| `FACTUS_EASY_EMAIL` | Sí | — | Email para autenticación |
+| `FACTUS_EASY_PASSWORD` | Sí | — | Contraseña para autenticación |
+| `FACTUS_EASY_DOWNLOAD_DIR` | No | `examples/` | Carpeta donde se guardan los RIDE PDF |
+
+## Scripts disponibles
+
+```bash
+composer example:login       # php examples/auth/login.php
+composer example:register    # php examples/auth/register.php
+composer example:companies   # php examples/companies/list.php
+composer example:invoice     # php examples/documents/register-invoice.php
+composer example:status      # php examples/documents/status.php
+composer example:ride        # php examples/documents/ride.php
+composer example:certificate # php examples/companies/certificate.php
+```
 
 ## Ejemplos disponibles
 
@@ -435,14 +522,6 @@ php examples/documents/batch.php
 php examples/documents/status.php
 php examples/documents/ride.php
 ```
-
-## Variables de entorno
-
-| Variable | Obligatorio | Default | Descripción |
-|----------|-------------|---------|-------------|
-| `FACTUS_EASY_EMAIL` | Sí | — | Email para autenticación |
-| `FACTUS_EASY_PASSWORD` | Sí | — | Contraseña para autenticación |
-| `FACTUS_EASY_DOWNLOAD_DIR` | No | `examples/` | Carpeta donde se guardan los RIDE PDF |
 
 ## Desarrollo local
 

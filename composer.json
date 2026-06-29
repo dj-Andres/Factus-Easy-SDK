@@ -27,5 +27,16 @@
         "psr-4": {
             "FactusEasy\\Sdk\\Tests\\": "tests/"
         }
+    },
+    "scripts": {
+        "example:login": "@php examples/auth/login.php",
+        "example:register": "@php examples/auth/register.php",
+        "example:companies": "@php examples/companies/list.php",
+        "example:invoice": "@php examples/documents/register-invoice.php",
+        "example:status": "@php examples/documents/status.php",
+        "example:ride": "@php examples/documents/ride.php",
+        "example:certificate": "@php examples/companies/certificate.php",
+        "lint": "vendor/bin/pint",
+        "test": "vendor/bin/phpunit"
     }
 }

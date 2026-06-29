@@ -36,7 +36,7 @@ $idempotencyKey = bin2hex(random_bytes(16));
 $externalId = 'fact-' . date('Ymd') . '-' . time();
 
 $payload = [
-    'ruc' => '0791844433001',
+    'ruc' => '1234567890001',
     'tipo' => '01',
     'id_externo' => $externalId,
     'factura' => [

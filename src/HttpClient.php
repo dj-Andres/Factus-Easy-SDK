@@ -3,7 +3,10 @@
 namespace FactusEasy\Sdk;
 
 use FactusEasy\Sdk\Exceptions\AuthenticationException;
+use FactusEasy\Sdk\Exceptions\ConflictException;
 use FactusEasy\Sdk\Exceptions\FactusEasyException;
+use FactusEasy\Sdk\Exceptions\NotFoundException;
+use FactusEasy\Sdk\Exceptions\RateLimitException;
 use FactusEasy\Sdk\Exceptions\ValidationException;
 use GuzzleHttp\Client as GuzzleClient;
 use GuzzleHttp\Exception\GuzzleException;
@@ -11,14 +14,21 @@ use Psr\Http\Message\ResponseInterface;
 
 class HttpClient
 {
+    private const VERSION = '0.1.0';
+
     private readonly GuzzleClient $client;
 
     private ?string $token = null;
 
+    private ?string $requestId = null;
+
     public function __construct(
         private readonly Config $config,
     ) {
-        $this->client = new GuzzleClient($this->config->toGuzzleConfig());
+        $guzzleConfig = $this->config->toGuzzleConfig();
+        $guzzleConfig['headers']['User-Agent'] = 'factus-easy-php-sdk/' . self::VERSION;
+
+        $this->client = new GuzzleClient($guzzleConfig);
     }
 
     public function setToken(?string $token): void
@@ -34,6 +44,11 @@ class HttpClient
     public function clearToken(): void
     {
         $this->token = null;
+    }
+
+    public function setRequestId(?string $requestId): void
+    {
+        $this->requestId = $requestId;
     }
 
     public function get(string $uri, array $options = []): array
@@ -65,6 +80,7 @@ class HttpClient
     public function request(string $method, string $uri, array $options = []): array
     {
         $options = $this->addAuthHeader($options);
+        $options = $this->addRequestIdHeader($options);
 
         try {
             $response = $this->client->request($method, $uri, $options);
@@ -83,6 +99,7 @@ class HttpClient
     public function requestRaw(string $method, string $uri, array $options = []): ResponseInterface
     {
         $options = $this->addAuthHeader($options);
+        $options = $this->addRequestIdHeader($options);
 
         try {
             return $this->client->request($method, $uri, $options);
@@ -100,6 +117,15 @@ class HttpClient
     {
         if ($this->token !== null) {
             $options['headers']['Authorization'] = "Bearer {$this->token}";
+        }
+
+        return $options;
+    }
+
+    private function addRequestIdHeader(array $options): array
+    {
+        if ($this->requestId !== null) {
+            $options['headers']['X-Request-Id'] = $this->requestId;
         }
 
         return $options;
@@ -123,7 +149,7 @@ class HttpClient
             }
 
             if ($statusCode >= 400) {
-                $this->handleError($data, $statusCode);
+                $this->handleError($data, $statusCode, $response);
             }
 
             return $data;
@@ -144,13 +170,26 @@ class HttpClient
         ];
     }
 
-    private function handleError(array $data, int $statusCode): never
+    private function handleError(array $data, int $statusCode, ?ResponseInterface $response = null): never
     {
         $message = $data['message'] ?? 'Unknown error';
         $code = $data['code'] ?? $statusCode;
+        $context = $data;
+
+        if ($response !== null) {
+            $context['headers'] = $response->getHeaders();
+        }
 
         if ($statusCode === 401) {
             throw new AuthenticationException($message, $code);
+        }
+
+        if ($statusCode === 404) {
+            throw new NotFoundException($message, $code);
+        }
+
+        if ($statusCode === 409) {
+            throw new ConflictException($message, $code);
         }
 
         if ($statusCode === 422) {
@@ -159,6 +198,16 @@ class HttpClient
             throw new ValidationException($message, $code, null, $errors);
         }
 
-        throw new FactusEasyException($message, $code, context: $data);
+        if ($statusCode === 429) {
+            $retryAfter = null;
+
+            if ($response !== null && $response->hasHeader('Retry-After')) {
+                $retryAfter = (int) $response->getHeaderLine('Retry-After');
+            }
+
+            throw new RateLimitException($message, $code, null, $retryAfter);
+        }
+
+        throw new FactusEasyException($message, $code, context: $context);
     }
 }

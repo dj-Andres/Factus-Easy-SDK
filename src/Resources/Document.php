@@ -47,4 +47,14 @@ class Document
 
         return (string) $response->getBody();
     }
+
+    public function downloadRideTo(string $accessKey, string $ruc, string $path): string
+    {
+        $response = $this->http->requestRaw('GET', "/api/document/{$accessKey}/ride", [
+            'query' => ['ruc' => $ruc],
+            'sink' => $path,
+        ]);
+
+        return $path;
+    }
 }
