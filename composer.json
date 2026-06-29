@@ -12,8 +12,8 @@
         }
     ],
     "support": {
-        "issues": "https://github.com/factus-easy/factus-easy-sdk/issues",
-        "source": "https://github.com/factus-easy/factus-easy-sdk"
+        "issues": "https://github.com/dj-Andres/Factus-Easy-SDK/issues",
+        "source": "https://github.com/dj-Andres/Factus-Easy-SDK"
     },
     "require": {
         "php": "^8.3",

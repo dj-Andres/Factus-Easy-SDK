@@ -13,8 +13,26 @@ SDK oficial para integrar la API de **Factus Easy** — Facturación Electrónic
 
 ## Instalación
 
+Agrega el repositorio y el paquete a tu `composer.json`:
+
+```json
+{
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/dj-Andres/Factus-Easy-SDK"
+        }
+    ],
+    "require": {
+        "factus-easy/factus-easy-sdk": "dev-main"
+    }
+}
+```
+
+Luego ejecuta:
+
 ```bash
-composer require factus-easy/factus-easy-sdk
+composer update factus-easy/factus-easy-sdk
 ```
 
 ## Configuración inicial
@@ -526,7 +544,7 @@ php examples/documents/ride.php
 ## Desarrollo local
 
 ```bash
-git clone https://github.com/factus-easy/factus-easy-sdk.git
+git clone https://github.com/dj-Andres/Factus-Easy-SDK.git
 cd factus-easy-sdk
 composer install && cp .env.test .env
 # Editar .env con credenciales reales
