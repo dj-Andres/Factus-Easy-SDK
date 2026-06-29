@@ -16,8 +16,8 @@
 require __DIR__ . '/../config.php';
 
 $factus = createClient(
-    email: 'andres96jimenez@gmail.com',
-    password: '619-Diego',
+    email: 'test@example.com',
+    password: '12345678',
 );
 
 try {
