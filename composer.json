@@ -4,18 +4,25 @@
     "type": "library",
     "license": "MIT",
     "keywords": ["factus-easy", "sri", "ecuador", "facturacion-electronica", "sdk"],
+    "homepage": "https://factuseasy.kreativesofts.com",
     "authors": [
         {
             "name": "Diego Jimenez",
             "email": "andres96jimenez@gmail.com"
         }
     ],
+    "support": {
+        "issues": "https://github.com/factus-easy/factus-easy-sdk/issues",
+        "source": "https://github.com/factus-easy/factus-easy-sdk"
+    },
     "require": {
         "php": "^8.3",
         "guzzlehttp/guzzle": "^7.0",
         "vlucas/phpdotenv": "^5.6"
     },
     "require-dev": {
+        "laravel/pint": "^1.16",
+        "phpstan/phpstan": "^1.11",
         "phpunit/phpunit": "^11.0"
     },
     "autoload": {
@@ -37,6 +44,7 @@
         "example:ride": "@php examples/documents/ride.php",
         "example:certificate": "@php examples/companies/certificate.php",
         "lint": "vendor/bin/pint",
-        "test": "vendor/bin/phpunit"
+        "test": "vendor/bin/phpunit",
+        "analyse": "vendor/bin/phpstan analyse --level 6 src/"
     }
 }
