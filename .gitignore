@@ -1,6 +1,7 @@
 vendor/
 node_modules/
 .env
+!.env.test
 .DS_Store
 Thumbs.db
 *.log

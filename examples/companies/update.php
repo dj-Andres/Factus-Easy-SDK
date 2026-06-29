@@ -23,10 +23,7 @@
 
 require __DIR__ . '/../config.php';
 
-$factus = createClient(
-    email: 'tu-email@ejemplo.com',
-    password: 'tu-contraseña',
-);
+$factus = createClient();
 
 try {
     $response = $factus->company()->update('1234567890001', [

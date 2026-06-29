@@ -15,10 +15,7 @@
 
 require __DIR__ . '/../config.php';
 
-$factus = createClient(
-    email: 'test@example.com',
-    password: '12345678',
-);
+$factus = createClient();
 
 try {
     $response = $factus->company()->list();

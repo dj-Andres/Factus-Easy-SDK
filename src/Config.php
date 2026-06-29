@@ -7,7 +7,7 @@ class Config
     private array $options;
 
     private const DEFAULTS = [
-        'base_url' => 'https://factuseasy.kreativesofts.com/api',
+        'base_url' => 'https://factuseasy.kreativesofts.com',
         'timeout' => 30,
         'connect_timeout' => 10,
         'verify' => true,

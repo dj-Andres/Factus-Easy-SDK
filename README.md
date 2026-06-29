@@ -17,6 +17,21 @@ SDK oficial para integrar la API de **Factus Easy** — Facturación Electrónic
 composer require factus-easy/factus-easy-sdk
 ```
 
+## Configuración inicial
+
+Copia el archivo de ejemplo y edita tus credenciales:
+
+```bash
+cp .env.test .env
+```
+
+Edita `.env` con tus credenciales:
+
+```env
+FACTUS_EASY_EMAIL=tu-email@ejemplo.com
+FACTUS_EASY_PASSWORD=tu-contraseña
+```
+
 ## Uso rápido
 
 ```php

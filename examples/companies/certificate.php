@@ -18,10 +18,7 @@
 
 require __DIR__ . '/../config.php';
 
-$factus = createClient(
-    email: 'tu-email@ejemplo.com',
-    password: 'tu-contraseña',
-);
+$factus = createClient();
 
 $ruc = '1234567890001';
 $certPath = __DIR__ . '/../test-certificate.p12';

@@ -4,6 +4,7 @@ namespace FactusEasy\Sdk;
 
 use FactusEasy\Sdk\Resources\Auth;
 use FactusEasy\Sdk\Resources\Company;
+use FactusEasy\Sdk\Resources\Document;
 
 class FactusEasy
 {
@@ -14,6 +15,8 @@ class FactusEasy
     private ?Auth $auth = null;
 
     private ?Company $company = null;
+
+    private ?Document $document = null;
 
     public function __construct(array $options = [])
     {
@@ -37,6 +40,15 @@ class FactusEasy
         }
 
         return $this->company;
+    }
+
+    public function document(): Document
+    {
+        if ($this->document === null) {
+            $this->document = new Document($this->http);
+        }
+
+        return $this->document;
     }
 
     public function setToken(string $token): void

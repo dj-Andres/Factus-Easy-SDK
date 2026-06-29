@@ -16,10 +16,7 @@
 
 require __DIR__ . '/../config.php';
 
-$factus = createClient(
-    email: 'tu-email@ejemplo.com',
-    password: 'tu-contraseña',
-);
+$factus = createClient();
 
 $ruc = '1234567890001';
 $logoPath = __DIR__ . '/../test-logo.png';
