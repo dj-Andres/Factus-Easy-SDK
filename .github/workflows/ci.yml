@@ -27,10 +27,7 @@ jobs:
       - run: composer install --no-interaction --prefer-dist --no-progress
 
       - run: vendor/bin/pint --test
-        continue-on-error: true
 
-      - run: vendor/bin/phpstan analyse --no-progress --level 6 src/
-        continue-on-error: true
+      - run: vendor/bin/phpstan analyse --no-progress src/
 
       - run: vendor/bin/phpunit
-        continue-on-error: true
