@@ -16,12 +16,12 @@
  *   data: { ruc, name, certificate, signature_issue_date, signature_expiration_date }
  */
 
-require __DIR__ . '/../config.php';
+require __DIR__.'/../config.php';
 
 $factus = createClient();
 
 $ruc = '1234567890001';
-$certPath = __DIR__ . '/../test-certificate.p12';
+$certPath = __DIR__.'/../test-certificate.p12';
 $certPassword = 'mi-password-del-cert';
 
 if (! file_exists($certPath)) {

@@ -14,12 +14,12 @@
  *   data: { ruc, name, logo, ... }
  */
 
-require __DIR__ . '/../config.php';
+require __DIR__.'/../config.php';
 
 $factus = createClient();
 
 $ruc = '1234567890001';
-$logoPath = __DIR__ . '/../test-logo.png';
+$logoPath = __DIR__.'/../test-logo.png';
 
 if (! file_exists($logoPath)) {
     echo "SKIP\n";

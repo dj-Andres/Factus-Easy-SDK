@@ -15,7 +15,7 @@
  *   Content-Disposition: attachment; filename="RIDE_{accessKey}.pdf"
  */
 
-require __DIR__ . '/../config.php';
+require __DIR__.'/../config.php';
 
 $factus = createClient();
 
@@ -26,22 +26,22 @@ $downloadDir = $_ENV['FACTUS_EASY_DOWNLOAD_DIR'] ?? __DIR__;
 
 $downloadDir = rtrim($downloadDir, DIRECTORY_SEPARATOR);
 
-if (!is_dir($downloadDir)) {
-    if (!mkdir($downloadDir, 0775, true) && !is_dir($downloadDir)) {
+if (! is_dir($downloadDir)) {
+    if (! mkdir($downloadDir, 0775, true) && ! is_dir($downloadDir)) {
         echo "ERROR\n";
         echo "  No se pudo crear el directorio: {$downloadDir}\n";
         exit(1);
     }
 }
 
-if (!is_writable($downloadDir)) {
+if (! is_writable($downloadDir)) {
     echo "ERROR\n";
     echo "  Directorio no escribible: {$downloadDir}\n";
     exit(1);
 }
 
 $filename = "RIDE_{$accessKey}.pdf";
-$savePath = $downloadDir . DIRECTORY_SEPARATOR . $filename;
+$savePath = $downloadDir.DIRECTORY_SEPARATOR.$filename;
 
 echo "Descargando RIDE...\n";
 echo "  Access Key: {$accessKey}\n";
@@ -60,7 +60,7 @@ try {
 
     echo "RIDE DESCARGADO OK\n";
     echo "  Archivo: {$filename}\n";
-    echo "  Tamaño:  " . number_format($bytes) . " bytes\n";
+    echo '  Tamaño:  '.number_format($bytes)." bytes\n";
 } catch (Exception $e) {
     echo "ERROR\n";
     echo "  {$e->getMessage()}\n";

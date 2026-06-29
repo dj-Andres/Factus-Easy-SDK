@@ -23,13 +23,13 @@
  *   data.filters_applied     array   Filtros aplicados
  */
 
-require __DIR__ . '/../config.php';
+require __DIR__.'/../config.php';
 
 $factus = createClient();
 
 // ─── 1. Consultar por external_id ───────────────────
 echo "1. Consulta por External ID\n";
-echo str_repeat('─', 40) . "\n";
+echo str_repeat('─', 40)."\n";
 
 try {
     $response = $factus->document()->status([
@@ -54,7 +54,7 @@ echo "\n";
 
 // ─── 2. Listar documentos con filtros ───────────────
 echo "2. Listado con filtros\n";
-echo str_repeat('─', 40) . "\n";
+echo str_repeat('─', 40)."\n";
 
 try {
     $response = $factus->document()->status([
@@ -86,7 +86,7 @@ echo "\n";
 
 // ─── 3. Solo resumen (sin external_id) ──────────────
 echo "3. Resumen general\n";
-echo str_repeat('─', 40) . "\n";
+echo str_repeat('─', 40)."\n";
 
 try {
     $response = $factus->document()->status([

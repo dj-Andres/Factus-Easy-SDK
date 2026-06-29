@@ -1,5 +1,7 @@
 <?php
 
+use FactusEasy\Sdk\Exceptions\ValidationException;
+
 /**
  * POST /api/document/register
  *
@@ -32,13 +34,13 @@
  *   notificaciones               array
  */
 
-require __DIR__ . '/../config.php';
+require __DIR__.'/../config.php';
 
 $factus = createClient();
 
 $idempotencyKey = bin2hex(random_bytes(16));
 
-$externalId = 'ret-' . date('Ymd') . '-' . time();
+$externalId = 'ret-'.date('Ymd').'-'.time();
 
 $payload = [
     'ruc' => '1234567890001',
@@ -89,11 +91,11 @@ try {
     echo "  Series:     {$doc['series']}\n";
     echo "  Sequential: {$doc['sequential']}\n";
     echo "  Status:     {$doc['document_status']}\n";
-} catch (FactusEasy\Sdk\Exceptions\ValidationException $e) {
+} catch (ValidationException $e) {
     echo "VALIDATION ERROR\n";
     echo "  {$e->getMessage()}\n";
     foreach ($e->getErrors() as $field => $messages) {
-        echo "  {$field}: " . implode(', ', (array) $messages) . "\n";
+        echo "  {$field}: ".implode(', ', (array) $messages)."\n";
     }
 } catch (Exception $e) {
     echo "ERROR\n";

@@ -26,7 +26,7 @@ class HttpClient
         private readonly Config $config,
     ) {
         $guzzleConfig = $this->config->toGuzzleConfig();
-        $guzzleConfig['headers']['User-Agent'] = 'factus-easy-php-sdk/' . self::VERSION;
+        $guzzleConfig['headers']['User-Agent'] = 'factus-easy-php-sdk/'.self::VERSION;
 
         $this->client = new GuzzleClient($guzzleConfig);
     }

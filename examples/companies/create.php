@@ -1,5 +1,7 @@
 <?php
 
+use FactusEasy\Sdk\Exceptions\ValidationException;
+
 /**
  * POST /api/companie/register
  *
@@ -23,7 +25,7 @@
  *   data: { ruc, name, business_name, status, ... }
  */
 
-require __DIR__ . '/../config.php';
+require __DIR__.'/../config.php';
 
 $factus = createClient();
 
@@ -37,7 +39,7 @@ try {
         'accounting_required' => 'SI',
         'special_taxpayer' => 'NO',
         'major_taxpayer' => 'NO',
-        'email' => 'empresa-' . time() . '@ejemplo.com',
+        'email' => 'empresa-'.time().'@ejemplo.com',
     ]);
 
     $c = $response['data'];
@@ -48,11 +50,11 @@ try {
     echo "  BusinessName: {$c['business_name']}\n";
     echo "  Status:       {$c['status']}\n";
     echo "  Email:        {$c['email']}\n";
-} catch (FactusEasy\Sdk\Exceptions\ValidationException $e) {
+} catch (ValidationException $e) {
     echo "VALIDATION ERROR\n";
     echo "  {$e->getMessage()}\n";
     foreach ($e->getErrors() as $field => $messages) {
-        echo "  {$field}: " . implode(', ', (array) $messages) . "\n";
+        echo "  {$field}: ".implode(', ', (array) $messages)."\n";
     }
 } catch (Exception $e) {
     echo "ERROR\n";

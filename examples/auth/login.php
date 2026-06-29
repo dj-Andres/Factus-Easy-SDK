@@ -1,5 +1,7 @@
 <?php
 
+use FactusEasy\Sdk\Exceptions\AuthenticationException;
+
 /**
  * POST /api/login
  *
@@ -20,7 +22,7 @@
  *   message: "The provided credentials are incorrect"
  */
 
-require __DIR__ . '/../config.php';
+require __DIR__.'/../config.php';
 
 $factus = createClient();
 
@@ -32,7 +34,7 @@ try {
 
     echo "LOGIN OK\n";
     echo "  Token: {$token}\n";
-} catch (FactusEasy\Sdk\Exceptions\AuthenticationException $e) {
+} catch (AuthenticationException $e) {
     echo "AUTH ERROR\n";
     echo "  {$e->getMessage()}\n";
 } catch (Exception $e) {

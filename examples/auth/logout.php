@@ -18,7 +18,7 @@
  *   data: []
  */
 
-require __DIR__ . '/../config.php';
+require __DIR__.'/../config.php';
 
 $factus = createClient();
 
@@ -41,7 +41,7 @@ try {
     $result = $factus->auth()->logout();
 
     echo "LOGOUT OK\n";
-    echo "  Resultado: " . ($result ? 'token invalidado' : 'falló') . "\n";
+    echo '  Resultado: '.($result ? 'token invalidado' : 'falló')."\n";
 } catch (Exception $e) {
     echo "LOGOUT ERROR\n";
     echo "  {$e->getMessage()}\n";

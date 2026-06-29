@@ -1,5 +1,7 @@
 <?php
 
+use FactusEasy\Sdk\Exceptions\ValidationException;
+
 /**
  * POST /api/document/batch/register
  *
@@ -27,7 +29,7 @@
  *   data.status:         Estado del lote
  */
 
-require __DIR__ . '/../config.php';
+require __DIR__.'/../config.php';
 
 $factus = createClient();
 
@@ -38,7 +40,7 @@ $payload = [
     'tipo' => '01',
     'documentos' => [
         [
-            'id_externo' => 'batch-' . time() . '-1',
+            'id_externo' => 'batch-'.time().'-1',
             'factura' => [
                 'fecha' => date('d/m/Y'),
                 'establecimiento' => '001',
@@ -63,17 +65,17 @@ $payload = [
                     'precioTotalSinImpuesto' => 10.00,
                     'impuestos' => [
                         [
-                    'codigo' => '2',
-                    'codigoPorcentaje' => '4',
-                    'tarifa' => 15.00,
-                    'baseImponible' => 10.00,
-                    'valor' => 1.50,
+                            'codigo' => '2',
+                            'codigoPorcentaje' => '4',
+                            'tarifa' => 15.00,
+                            'baseImponible' => 10.00,
+                            'valor' => 1.50,
+                        ],
+                    ],
                 ],
             ],
-        ],
-    ],
-    'pagos' => [
-        ['formaPago' => '01', 'total' => 11.50],
+            'pagos' => [
+                ['formaPago' => '01', 'total' => 11.50],
             ],
             'notificaciones' => [
                 'email' => null,
@@ -81,7 +83,7 @@ $payload = [
             ],
         ],
         [
-            'id_externo' => 'batch-' . time() . '-2',
+            'id_externo' => 'batch-'.time().'-2',
             'factura' => [
                 'fecha' => date('d/m/Y'),
                 'establecimiento' => '001',
@@ -106,17 +108,17 @@ $payload = [
                     'precioTotalSinImpuesto' => 20.00,
                     'impuestos' => [
                         [
-                    'codigo' => '2',
-                    'codigoPorcentaje' => '4',
-                    'tarifa' => 15.00,
-                    'baseImponible' => 20.00,
-                    'valor' => 3.00,
+                            'codigo' => '2',
+                            'codigoPorcentaje' => '4',
+                            'tarifa' => 15.00,
+                            'baseImponible' => 20.00,
+                            'valor' => 3.00,
+                        ],
+                    ],
                 ],
             ],
-        ],
-    ],
-    'pagos' => [
-        ['formaPago' => '01', 'total' => 23.00],
+            'pagos' => [
+                ['formaPago' => '01', 'total' => 23.00],
             ],
             'notificaciones' => [
                 'email' => null,
@@ -127,7 +129,7 @@ $payload = [
 ];
 
 echo "Enviando lote de documentos...\n";
-echo "  Documentos: " . count($payload['documentos']) . "\n";
+echo '  Documentos: '.count($payload['documentos'])."\n";
 echo "  Idempotency: {$idempotencyKey}\n\n";
 
 try {
@@ -141,11 +143,11 @@ try {
     echo "  Tipo:        {$data['tipo']}\n";
     echo "  Documentos:  {$data['documents_count']}\n";
     echo "  Status:      {$data['status']}\n";
-} catch (FactusEasy\Sdk\Exceptions\ValidationException $e) {
+} catch (ValidationException $e) {
     echo "VALIDATION ERROR\n";
     echo "  {$e->getMessage()}\n";
     foreach ($e->getErrors() as $field => $messages) {
-        echo "  {$field}: " . implode(', ', (array) $messages) . "\n";
+        echo "  {$field}: ".implode(', ', (array) $messages)."\n";
     }
 } catch (Exception $e) {
     echo "ERROR\n";

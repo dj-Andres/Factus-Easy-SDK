@@ -13,7 +13,7 @@
  *   data: [ { ruc, name, business_name, address, phone, email, status, ... } ]
  */
 
-require __DIR__ . '/../config.php';
+require __DIR__.'/../config.php';
 
 $factus = createClient();
 
@@ -22,7 +22,7 @@ try {
     $companies = $response['data'] ?? [];
 
     echo "LIST COMPANIES OK\n";
-    echo "  Total: " . count($companies) . "\n";
+    echo '  Total: '.count($companies)."\n";
 
     foreach ($companies as $c) {
         echo "\n";
