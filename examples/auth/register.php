@@ -25,10 +25,10 @@ $factus = createClient();
 
 try {
     $result = $factus->auth()->register(
-        name: 'Diego Jimenez',
-        email: 'tic5@grupogramsa.com.ec',
-        password: '12345678',
-        passwordConfirmation: '12345678',
+        name: 'test user',
+        email: 'test@exmaple.com',
+        password: 'test123',
+        passwordConfirmation: 'test123',
     );
 
     echo "REGISTER OK\n";
