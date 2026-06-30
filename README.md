@@ -1,5 +1,9 @@
 # Factus Easy SDK PHP
 
+[![Packagist Version](https://img.shields.io/packagist/v/factus-easy/factus-easy-sdk)](https://packagist.org/packages/factus-easy/factus-easy-sdk)
+[![License](https://img.shields.io/packagist/l/factus-easy/factus-easy-sdk)](LICENSE)
+[![PHP Version](https://img.shields.io/packagist/php-v/factus-easy/factus-easy-sdk)](composer.json)
+
 SDK oficial para integrar la API de **Factus Easy** — Facturación Electrónica SRI Ecuador.
 
 > Consulta la documentación completa de la API en [factuseasy.kreativesofts.com/docs](https://factuseasy.kreativesofts.com/docs)
@@ -13,26 +17,8 @@ SDK oficial para integrar la API de **Factus Easy** — Facturación Electrónic
 
 ## Instalación
 
-Agrega el repositorio y el paquete a tu `composer.json`:
-
-```json
-{
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/dj-Andres/Factus-Easy-SDK"
-        }
-    ],
-    "require": {
-        "factus-easy/factus-easy-sdk": "dev-main"
-    }
-}
-```
-
-Luego ejecuta:
-
 ```bash
-composer update factus-easy/factus-easy-sdk
+composer require factus-easy/factus-easy-sdk:^0.1
 ```
 
 ## Configuración inicial
@@ -546,7 +532,8 @@ php examples/documents/ride.php
 ```bash
 git clone https://github.com/dj-Andres/Factus-Easy-SDK.git
 cd factus-easy-sdk
-composer install && cp .env.test .env
+composer install
+cp .env.test .env
 # Editar .env con credenciales reales
 php examples/companies/list.php
 ```
